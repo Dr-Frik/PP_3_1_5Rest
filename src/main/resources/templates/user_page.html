@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User</title>
+</head>
+<body>
+<ul>
+    <p th:utext="${user.getId()}">VALUE</p>
+    <p th:utext="${user.getName()}">VALUE</p>
+    <p th:utext="${user.getAddress()}">VALUE</p>
+    <br/>
+</ul>
+<ul>
+    <div th:each="userRole : ${user.getRoleSet()}">
+        <p th:text="${userRole.getRoleName()}">VALUE</p>
+    </div>
+</ul>
+<ul>
+    <form th:method="DELETE" th:action="@{/deleteUser/{id}(id=${user.getId()})}">
+        <input type="submit" value="УДАЛИТЬ ПОЛЬЗОВАТЕЛЯ"/>
+    </form>
+</ul>
+<ul>
+    <form th:method="GET" th:action="@{/edit/{id}(id=${user.getId()})}">
+        <input type="submit" value="РЕДАКТИРОВАТЬ ПОЛЬЗОВАТЕЛЯ"/>
+    </form>
+
+</ul>
+<ul>
+    <form th:method="GET" th:action="@{/admin}">
+        <input type="submit" value="К СПИСКУ ПОЛЬЗАВАТЕЛЕЙ"/>
+    </form>
+</ul>
+<br/>
+<ul>
+    <form th:method="GET" th:action="@{/logout}">
+        <input type="submit" value="LOGOUT"/>
+    </form>
+</ul>
+</body>
+</html>
