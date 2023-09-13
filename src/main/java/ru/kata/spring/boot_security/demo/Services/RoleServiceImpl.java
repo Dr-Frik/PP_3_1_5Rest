@@ -18,7 +18,6 @@ public class RoleServiceImpl implements RoleService {
 
     @Transactional
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Role getById(int id) {
         return roleRepository.getById(id);
     }

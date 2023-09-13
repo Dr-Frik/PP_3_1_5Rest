@@ -41,8 +41,19 @@ public class UserController {
             userRole.add(role);
         }
         user.setRoleSet(userRole);
-        userService.saveNewUser(user);
+        userService.saveNewUser(user, listRoleId);
         return "redirect:/admin";
+    }
+    @PatchMapping("update/{id}")
+    public String update(@ModelAttribute User user, @PathVariable int id, @RequestParam ArrayList<String> roleSet) {
+        userService.updateUser(id, user, roleSet);
+        return "redirect:/admin";
+    }
+    @GetMapping("edit/{id}")
+    public String edit(Model model, @PathVariable ("id") int id) {
+        User user = userService.getById(id);
+        model.addAttribute("user", user);
+        return "edit";
     }
 
     @GetMapping("/userinfo")
@@ -63,17 +74,7 @@ public class UserController {
         model.addAttribute("user", user);
         return "user_page";
     }
-    @GetMapping("edit/{id}")
-    public String edit(Model model, @PathVariable ("id") int id) {
-        User user = userService.getById(id);
-        model.addAttribute("user", user);
-        return "edit";
-    }
-    @PatchMapping("update/{id}")
-    public String update(@ModelAttribute User user, @PathVariable int id) {
-        userService.updateUser(id, user);
-        return "redirect:/admin";
-    }
+
     @DeleteMapping("/deleteUser/{id}")
     public String deleteUser(@PathVariable("id") int id) {
         userService.deleteUser(id);

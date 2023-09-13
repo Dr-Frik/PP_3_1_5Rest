@@ -1,5 +1,6 @@
 package ru.kata.spring.boot_security.demo.configs;
 
+import jdk.dynalink.NamedOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -34,8 +36,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // конфиг спринга и авторизации
         http
                 .authorizeRequests()
-                .antMatchers("/login", "/error").permitAll() // неавторизованный может попасть только на эти страницы
-                .antMatchers("/admin", "/userinfo", "/hello","/registration", "/edit/**", "/update/**").hasRole("ADMIN")//"/user/**"
+                .antMatchers("/login", "/error").permitAll()// неавторизованный может попасть только на эти страницы
+                .antMatchers("/admin", "/userinfo", "/hello", "/edit/**", "/update/**", "/registration").hasRole("ADMIN")
                 .antMatchers("/userinfo").hasAnyRole("USER","ADMIN")
                 .anyRequest().authenticated()
                 .and()
@@ -53,10 +55,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
     // настройка аутентификации
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsServiceImpl);
+        auth.userDetailsService(userDetailsServiceImpl)
+                .passwordEncoder(getPasswordEncoder());
     }
     @Bean
     public PasswordEncoder getPasswordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
 }
