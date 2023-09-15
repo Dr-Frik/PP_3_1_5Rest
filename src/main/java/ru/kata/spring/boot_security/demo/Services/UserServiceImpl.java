@@ -59,6 +59,9 @@ public class UserServiceImpl implements UserService{
         User userToUpdate = userRepository.getById(id);
         userToUpdate.setName(user.getName());
         userToUpdate.setAddress(user.getAddress());
+        if (!user.getPassword().equals(userToUpdate.getPassword())) {
+            userToUpdate.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         Set<Role> userRole = new HashSet<>();
         for (String roleId : roleSet) {
             Role role = roleService.getById(Integer.parseInt(roleId));
