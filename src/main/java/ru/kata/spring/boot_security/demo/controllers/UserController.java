@@ -10,7 +10,6 @@ import ru.kata.spring.boot_security.demo.Services.RoleService;
 import ru.kata.spring.boot_security.demo.Services.UserService;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -29,53 +28,45 @@ public class UserController {
     }
 
     @GetMapping("/registration")
-    public String registrationPage(@ModelAttribute("user") User user) {
+    public String registrationPage(@ModelAttribute("user") User user, Model model) {
+        model.addAttribute("roleSet", roleService.getAllRoles());
         return "/registration";
     }
 
     @PostMapping("/registration")
-    public String performRegistration(@ModelAttribute("user") User user, @RequestParam ArrayList<String> listRoleId) {
+    public String performRegistration(@ModelAttribute("user") User user, @RequestParam ArrayList<String> roleSet) {
         Set<Role> userRole = new HashSet<>();
-        for (String roleId : listRoleId) {
+        for (String roleId : roleSet) {
             Role role = roleService.getById(Integer.parseInt(roleId));
             userRole.add(role);
         }
         user.setRoleSet(userRole);
-        userService.saveNewUser(user, listRoleId);
+        userService.saveNewUser(user, roleSet);
         return "redirect:/admin";
     }
     @PatchMapping("update/{id}")
-    public String update(@ModelAttribute User user, @PathVariable int id, @RequestParam ArrayList<String> roleSet) {
-        userService.updateUser(id, user, roleSet);
+    public String update(@ModelAttribute User user, @PathVariable int id, @RequestParam ArrayList<String> roleSet1) {
+        userService.updateUser(id, user, roleSet1);
         return "redirect:/admin";
-    }
-    @GetMapping("edit/{id}")
-    public String edit(Model model, @PathVariable ("id") int id) {
-        User user = userService.getById(id);
-        model.addAttribute("user", user);
-        return "edit";
     }
 
     @GetMapping("/userinfo")
     public String userInfo(Model model) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         model.addAttribute("user", authentication.getPrincipal());
-        return "/user";
+        return "user_page";
     }
     @GetMapping("/admin")
     public String adminPage(Model model) {
         List<User> userList = userService.getAllUsers();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        model.addAttribute("user", authentication.getPrincipal());
         model.addAttribute("userList", userList);
-        return "admin";
-    }
-    @GetMapping(value = "/user/{id}")
-    public String getUserById(@PathVariable("id") int id, Model model) {
-        User user = userService.getById(id);
-        model.addAttribute("user", user);
-        return "user_page";
+        model.addAttribute("roleSet1", roleService.getAllRoles());
+        return "admin_new";
     }
 
-    @DeleteMapping("/deleteUser/{id}")
+    @DeleteMapping("/delete/{id}")
     public String deleteUser(@PathVariable("id") int id) {
         userService.deleteUser(id);
         return "redirect:/admin";

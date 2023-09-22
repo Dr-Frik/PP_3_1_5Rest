@@ -1,36 +1,97 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" class="h-100"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>New user</title>
+  <link rel="stylesheet"
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+        crossorigin="anonymous">
 </head>
 <body>
 
-<ul>
-  <form th:method="POST" th:action="@{/registration}" th:object="${user}">
-    <label for="username"> Введите имя пользователя</label>
-    <input type="text" th:field="*{name}" id="username"/>
+<div>
+  <nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand" style="color: whitesmoke;">
+      <b><span th:text="${user.getName()}">user NAME</span></b>
+      <span>with roles: </span>
+      <!--            <span sec:authentication="principal.authorities">[ROLE_USER, ROLE_ADMIN]</span>-->
+      <span th:each="role :${user.getRoleSet()}">
+                    <span th:text="${role.getRoleName()}">ROLE</span>
+            </span>
+    </a>
+    <a th:href="@{/logout}" style="color: gray;">Logout</a>
+  </nav>
+</div>
 
-    <br/>
+<section>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-2 p-0">
+        <div class="nav flex-column nav-pills pt-4" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+          <a class="nav-link active" aria-controls="v-pills-home" aria-selected="true">Admin</a>
+          <a class="nav-item nav-link" th:href="@{/userinfo}">User</a>
+        </div>
+      </div>
+      <div class="col-10 px-0">
+        <div class="container-fluid">
+          <h1 class="m-3 fw-bold">Admin panel</h1>
+          <div class="tab-content" id="tabContent">
+            <ul class="nav nav-tabs">
+              <a class="nav-link" data-toggle="tab" href="/admin">Users Table</a>
+              <a class="nav-link active" data-toggle="tab">New User</a>
+            </ul>
+            <div class="card">
+              <div class="card-header">
+                <div class="m-1">
+                  <h4>Add new user</h4>
+                </div>
+              </div>
+            </div>
+            <div class="col-md bg-white border">
+              <form align="center" class="offset-md-4 col-md-3 mt-4 mb-4"
+                    th:align="center"
+                    th:action="@{/registration}"
+                    th:object="${user}"
+                    method="POST">
+                <label for="name"><b>Name</b></label>
+                <input th:name="name" th:type="text" class="form-control" id="name" required/>
+                <br>
+                <label for="lastName"><b>Last Name</b></label>
+                <input th:name="lastName" th:type="text" class="form-control" id="lastName" required/>
+                <br>
+                <label for="Address"><b>Address</b></label>
+                <input th:name="address" th:type="text" class="form-control" id="Address"/>
+                <br>
+                <label for="password"><b>Password</b></label>
+                <input th:name="password" th:field="*{password}" th:type="password" class="form-control"
+                       id="password"/>
+                <br>
+                <label class="font-weight-bold mb-0">Role</label>
+                <select class="form-control form-control-sm" multiple name="roleSet"
+                        required style="height: 50px; width: 300px; margin: 0 auto">
+                  <option name="roleSet"
+                          th:each="role: ${roleSet}"
+                          th:text="${role.getRoleName()}"
+                          th:value="${role.getRoleId()}">
+                  </option>
+                </select>
+                <br>
+                <button th:type="submit" class="btn btn-success btn-lg" value="Add new user">Create new User
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <label for="address"> Введите адрес</label>
-    <input type="text" th:field="*{address}" id="address"/>
-
-    <br/>
-    <label for="password">Пароль:</label>
-    <input type="text" th:field="*{password}" id="password"/>
-
-    <br/>
-    <p><input type="checkbox" name="listRoleId" value="1" > ROLE_ADMIN</p>
-    <p><input type="checkbox" name="listRoleId" value="2" > ROLE_USER</p>
-    <br/>
-    <input type="submit" value="СОЗДАТЬ ПОЛЬЗОВАТЕЛЯ">
-  </form>
-</ul>
-<ul>
-  <form th:method="GET" th:action="@{/logout}">
-    <input type="submit" value="LOGOUT"/>
-  </form>
-</ul>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
 </body>
 </html>

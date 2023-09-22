@@ -1,42 +1,81 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html  xmlns:th="https://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
-    <meta charset="UTF-8">
-    <title>User</title>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous">
+
+    <title>User page</title>
+    <meta charset="utf-8" />
 </head>
 <body>
-<ul>
-    <p th:utext="${user.getId()}">VALUE</p>
-    <p th:utext="${user.getName()}">VALUE</p>
-    <p th:utext="${user.getAddress()}">VALUE</p>
-    <br/>
-</ul>
-<ul>
-    <div th:each="userRole : ${user.getRoleSet()}">
-        <p th:text="${userRole.getRoleName()}">VALUE</p>
-    </div>
-</ul>
-<ul>
-    <form th:method="DELETE" th:action="@{/deleteUser/{id}(id=${user.getId()})}">
-        <input type="submit" value="УДАЛИТЬ ПОЛЬЗОВАТЕЛЯ"/>
-    </form>
-</ul>
-<ul>
-    <form th:method="GET" th:action="@{/edit/{id}(id=${user.getId()})}">
-        <input type="submit" value="РЕДАКТИРОВАТЬ ПОЛЬЗОВАТЕЛЯ"/>
-    </form>
+<div>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" style="color: whitesmoke;">
+            <b><span th:text="${user.getName()}">user NAME</span></b>
+            <span>with roles: </span>
+            <span th:each="role :${user.getRoleSet()}">
+                    <span th:text="${role.getRoleName()}">ROLE</span>
+            </span>
+        </a>
+        <a th:href="@{/logout}" style="color: gray;">Logout</a>
+    </nav>
+</div>
+<!-- navbar -->
+<div class="container-fluid bg-light" >
+    <div class="row">
+        <div class="bg-white p-0 col-2 pt-3">
+            <div aria-orientation="vertical" class="nav flex-column nav-pills me-3 mw-100 w-100 p-0" id="v-pills-tab"
+                 role="tablist">
+<!--                <div sec:authorize="hasAuthority('ROLE_ADMIN')" >-->
+                    <a  sec:authorize="hasAuthority('ROLE_ADMIN')" class="nav-link" href="/admin"
+                       id="v-pills-home-tab"
+                       role="tab" >Admin</a>
+<!--                </div>-->
+<!--                <div sec:authorize="(hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER'))">-->
+                    <a sec:authorize="(hasAnyAuthority('ROLE_ADMIN', 'ROLE_USER'))"
+                       aria-controls="v-pills-profile" aria-selected="true"
+                       class="nav-link active" href="#" id="v-pills-profile-tab"
+                       role="tab" >User</a>
+<!--                </div>-->
+            </div>
+        </div>
+        <div class="col-md-10 pl-4 pt-3" style="height: 900px; background-color: whitesmoke;">
+            <div class="tab-content">
+                <b><h1>User information-page</h1></b>
+                <div class=" bg-light" style="padding-top: 20px; height: 900px">
+                    <div class="card table-responsive">
+                        <b class="card-header">About user</b>
+                        <div class="card-body">
+                            <table class=" table table-striped">
+                                <tbody>
+                                <tr>
+                                    <th scope="col">ID</th>
+                                    <th scope="col">First Name</th>
+                                    <th scope="col">Last Name</th>
+                                    <th scope="col">Address</th>
+                                    <th scope="col">Role</th>
+                                </tr>
+                                <td th:text="${user.getId()}">N1</td>
+                                <td th:text="${user.getName()}">name</td>
+                                <td th:text="${user.getLastName()}">Last name</td>
+                                <td th:text="${user.getAddress()}">Address</td>
+                                <td>
+                                            <span th:each=" userRole : ${user.getRoleSet()}">
+                                                <span th:text="${userRole.getRoleName()}">Role</span>
+                                            </span>
+                                </td>
+                                </tbody>
 
-</ul>
-<ul>
-    <form th:method="GET" th:action="@{/admin}">
-        <input type="submit" value="К СПИСКУ ПОЛЬЗАВАТЕЛЕЙ"/>
-    </form>
-</ul>
-<br/>
-<ul>
-    <form th:method="GET" th:action="@{/logout}">
-        <input type="submit" value="LOGOUT"/>
-    </form>
-</ul>
+
+                            </table>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

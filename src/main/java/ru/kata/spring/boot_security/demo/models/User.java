@@ -22,6 +22,8 @@ public class User implements UserDetails {
     private int id;
     @Column(name = "name")
     private String name;
+    @Column(name="last_name")
+    private String lastName;
     @Column(name = "address")
     private String address;
     @Column(name = "password")
@@ -33,8 +35,9 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String name, String address) {
+    public User(String name, String lastName, String address) {
         this.name = name;
+        this.lastName = lastName;
         this.address = address;
     }
 
@@ -52,6 +55,14 @@ public class User implements UserDetails {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getAddress() {
