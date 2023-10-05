@@ -1,20 +1,22 @@
 package ru.kata.spring.boot_security.demo.Services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kata.spring.boot_security.demo.DTO.UserDTO;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
@@ -25,17 +27,18 @@ public class UserServiceImpl implements UserService{
         this.passwordEncoder = passwordEncoder;
         this.roleService = roleService;
     }
-    @Transactional
+
     @Override
-    public void saveNewUser(User user, ArrayList<String> listRoleId) {
-        Set<Role> userRole = new HashSet<>();
-        for (String roleId : listRoleId) {
-            Role role = roleService.getById(Integer.parseInt(roleId));
-            userRole.add(role);
+    @Transactional
+    public void saveNewUser(UserDTO userDTO) {
+        Set<Role> newRoleSet = new HashSet<>();
+        for  (String id : userDTO.getRoleSet()) {
+            newRoleSet.add(roleService.getById(Integer.parseInt(id)));
         }
-        user.setRoleSet(userRole);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        User newUser = new User(userDTO.getName(), userDTO.getLastName(), userDTO.getAddress());
+        newUser.setPassword( passwordEncoder.encode(userDTO.getPassword()));
+        newUser.setRoleSet(newRoleSet);
+        userRepository.save(newUser);
     }
 
     @Transactional
@@ -44,30 +47,32 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User getById(int id) {
+    public User getById(long id) {
         return userRepository.getById(id);
     }
 
     @Override
-    public void deleteUser(int id) {
+    @Transactional
+    public void deleteUser(long id) {
         userRepository.deleteById(id);
     }
 
     @Override
     @Transactional
-    public void updateUser(int id, User user, ArrayList<String> roleSet) {
+    public void updateUser(UserDTO userDTO, long id) {
         User userToUpdate = userRepository.getById(id);
-        userToUpdate.setName(user.getName());
-        userToUpdate.setAddress(user.getAddress());
-        userToUpdate.setLastName(user.getLastName());
-        if (!user.getPassword().equals("")) {
-            userToUpdate.setPassword(passwordEncoder.encode(user.getPassword()));
+        userToUpdate.setName(userDTO.getName());
+        userToUpdate.setLastName(userDTO.getLastName());
+        userToUpdate.setAddress(userDTO.getAddress());
+        if (!userDTO.getPassword().equals("")) {
+            userToUpdate.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         }
-        Set<Role> userRole = new HashSet<>();
-        for (String roleId : roleSet) {
-            Role role = roleService.getById(Integer.parseInt(roleId));
-            userRole.add(role);
+        if (!userDTO.getRoleSet().isEmpty()) {
+            Set<Role> newRoleSet = new HashSet<>();
+            for  (String roleId : userDTO.getRoleSet()) {
+                newRoleSet.add(roleService.getById(Integer.parseInt(roleId)));
+            }
+            userToUpdate.setRoleSet(newRoleSet);
         }
-        userToUpdate.setRoleSet(userRole);
     }
 }

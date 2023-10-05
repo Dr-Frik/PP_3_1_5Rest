@@ -3,23 +3,17 @@ package ru.kata.spring.boot_security.demo.models;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.ManyToMany;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.FetchType;
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.Set;
 
 @Entity
-@Table(name="user")
+@Table(name="users")
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Column(name = "id")
+    private long id;
     @Column(name = "name")
     private String name;
     @Column(name="last_name")
@@ -29,7 +23,10 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "users_roles",
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roleSet;
 
     public User() {
@@ -41,7 +38,7 @@ public class User implements UserDetails {
         this.address = address;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -90,10 +87,13 @@ public class User implements UserDetails {
         return "User{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", address='" + address + '\'' +
                 ", password='" + password + '\'' +
+                ", roleSet=" + roleSet.stream().count() +
                 '}';
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roleSet;
