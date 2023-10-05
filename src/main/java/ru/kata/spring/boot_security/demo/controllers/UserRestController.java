@@ -3,10 +3,16 @@ package ru.kata.spring.boot_security.demo.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.DTO.UserDTO;
 import ru.kata.spring.boot_security.demo.Services.UserService;
+import ru.kata.spring.boot_security.demo.Util.UserNotCreatedException;
 import ru.kata.spring.boot_security.demo.models.User;
+
+import javax.persistence.EntityExistsException;
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -34,10 +40,19 @@ public class UserRestController {
     }
 
     @PostMapping("/users")
-    public ResponseEntity<UserDTO> apiAddNewUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<HttpStatus> apiAddNewUser(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            StringBuilder errorMsg = new StringBuilder();
+            List<FieldError> errors = bindingResult.getFieldErrors();
+            for (FieldError error : errors) {
+                errorMsg.append(error.getField())
+                        .append(" _ ").append(error.getDefaultMessage())
+                        .append(";");
+            }
+            throw new UserNotCreatedException(errorMsg.toString());
+        }
         userService.saveNewUser(userDTO);
         return new ResponseEntity<>(HttpStatus.OK);
-
     }
 
     @PutMapping("/updateUsers/{id}")
