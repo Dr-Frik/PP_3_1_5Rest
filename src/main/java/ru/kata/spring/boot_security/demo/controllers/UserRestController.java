@@ -48,8 +48,7 @@ public class UserRestController {
                 errorMsg.append(error.getField())
                         .append(" _ ").append(error.getDefaultMessage())
                         .append(";");
-            }
-            throw new UserNotCreatedException(errorMsg.toString());
+            } throw new UserNotCreatedException(errorMsg.toString());
         }
         userService.saveNewUser(userDTO);
         return new ResponseEntity<>(HttpStatus.OK);
